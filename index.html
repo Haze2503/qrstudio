@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Proper QR Studio</title>
+    <meta
+      name="description"
+      content="A polished QR code generator with live preview, exports, and multiple payload modes."
+    />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <div class="backdrop backdrop-one"></div>
+    <div class="backdrop backdrop-two"></div>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Proper QR Studio</p>
+          <h1>Generate QR codes that feel finished, not disposable.</h1>
+          <p class="hero-copy">
+            Build QR codes from links, plain text, Wi-Fi details, contact cards, or image data URLs.
+            Preview them live, add a logo, then export PNG or SVG with one click.
+          </p>
+        </div>
+        <div class="hero-card">
+          <div class="hero-stat">
+            <span>Modes</span>
+            <strong>5</strong>
+          </div>
+          <div class="hero-stat">
+            <span>Exports</span>
+            <strong>PNG / SVG</strong>
+          </div>
+          <div class="hero-stat">
+            <span>Extras</span>
+            <strong>Logo, copy, history</strong>
+          </div>
+          <button id="install-button" class="secondary-button install-button hidden" type="button">
+            Install app
+          </button>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <aside class="panel editor-panel">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Payload builder</p>
+              <h2>Choose what the QR should contain</h2>
+            </div>
+            <button id="fill-example" class="ghost-button" type="button">Load example</button>
+          </div>
+
+          <div class="mode-tabs" role="tablist" aria-label="QR payload modes">
+            <button class="mode-tab active" data-mode="link" type="button">Link</button>
+            <button class="mode-tab" data-mode="text" type="button">Text</button>
+            <button class="mode-tab" data-mode="wifi" type="button">Wi-Fi</button>
+            <button class="mode-tab" data-mode="contact" type="button">Contact</button>
+            <button class="mode-tab" data-mode="image" type="button">Image</button>
+          </div>
+
+          <div class="mode-panels">
+            <section class="mode-panel active" data-panel="link">
+              <label class="field">
+                <span>Link</span>
+                <input id="link-input" type="url" placeholder="https://example.com" />
+              </label>
+            </section>
+
+            <section class="mode-panel" data-panel="text">
+              <label class="field">
+                <span>Text</span>
+                <textarea id="text-input" rows="5" placeholder="Any plain text you want to encode"></textarea>
+              </label>
+            </section>
+
+            <section class="mode-panel" data-panel="wifi">
+              <div class="grid-two">
+                <label class="field">
+                  <span>Network name</span>
+                  <input id="wifi-ssid" type="text" placeholder="My Wi-Fi" />
+                </label>
+                <label class="field">
+                  <span>Security</span>
+                  <select id="wifi-security">
+                    <option value="WPA">WPA / WPA2 / WPA3</option>
+                    <option value="WEP">WEP</option>
+                    <option value="nopass">Open network</option>
+                  </select>
+                </label>
+              </div>
+              <div class="grid-two">
+                <label class="field">
+                  <span>Password</span>
+                  <input id="wifi-password" type="text" placeholder="Optional password" />
+                </label>
+                <label class="field inline-field">
+                  <input id="wifi-hidden" type="checkbox" />
+                  <span>Hidden network</span>
+                </label>
+              </div>
+            </section>
+
+            <section class="mode-panel" data-panel="contact">
+              <div class="grid-two">
+                <label class="field">
+                  <span>Full name</span>
+                  <input id="contact-name" type="text" placeholder="Avery Stone" />
+                </label>
+                <label class="field">
+                  <span>Organization</span>
+                  <input id="contact-org" type="text" placeholder="Proper Studio" />
+                </label>
+              </div>
+              <div class="grid-two">
+                <label class="field">
+                  <span>Phone</span>
+                  <input id="contact-phone" type="tel" placeholder="+1 555 012 3456" />
+                </label>
+                <label class="field">
+                  <span>Email</span>
+                  <input id="contact-email" type="email" placeholder="avery@example.com" />
+                </label>
+              </div>
+              <label class="field">
+                <span>Website</span>
+                <input id="contact-website" type="url" placeholder="https://properstudio.dev" />
+              </label>
+            </section>
+
+            <section class="mode-panel" data-panel="image">
+              <label class="field">
+                <span>Image file</span>
+                <input id="image-input" type="file" accept="image/*" />
+              </label>
+              <label class="field">
+                <span>Image link or data URL</span>
+                <textarea id="image-link" rows="4" placeholder="https://example.com/photo.png or a data:image/... string"></textarea>
+              </label>
+              <p class="helper-copy">
+                This mode encodes the image data itself. Small images work best because QR codes have tight capacity limits.
+              </p>
+            </section>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="settings-grid">
+            <label class="field">
+              <span>Size</span>
+              <input id="size-input" type="range" min="256" max="1024" value="512" step="16" />
+            </label>
+            <label class="field">
+              <span>Error correction</span>
+              <select id="error-correction">
+                <option value="L">Low</option>
+                <option value="M">Medium</option>
+                <option value="Q">Quartile</option>
+                <option value="H" selected>High</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Margin</span>
+              <input id="margin-input" type="range" min="0" max="8" value="2" step="1" />
+            </label>
+            <label class="field color-field">
+              <span>Foreground</span>
+              <input id="foreground-input" type="color" value="#0f172a" />
+            </label>
+            <label class="field color-field">
+              <span>Background</span>
+              <input id="background-input" type="color" value="#f8fafc" />
+            </label>
+            <label class="field color-field">
+              <span>Frame color</span>
+              <input id="frame-color" type="color" value="#d6dee9" />
+            </label>
+          </div>
+
+          <div class="logo-row">
+            <label class="field stretch">
+              <span>Center logo</span>
+              <input id="logo-input" type="file" accept="image/*" />
+            </label>
+            <button id="clear-logo" class="ghost-button" type="button">Remove logo</button>
+          </div>
+
+          <div class="actions">
+            <button id="generate-button" class="primary-button" type="button">Generate</button>
+            <button id="copy-image-button" class="secondary-button" type="button">Copy PNG</button>
+            <button id="download-png-button" class="secondary-button" type="button">Save PNG</button>
+            <button id="download-svg-button" class="secondary-button" type="button">Save SVG</button>
+            <button id="copy-text-button" class="ghost-button" type="button">Copy content</button>
+            <button id="reset-button" class="ghost-button" type="button">Clear</button>
+          </div>
+
+          <div class="status-card">
+            <div>
+              <p class="status-label">Payload</p>
+              <strong id="payload-length">0 characters</strong>
+            </div>
+            <div>
+              <p class="status-label">Result</p>
+              <strong id="status-text">Ready</strong>
+            </div>
+          </div>
+
+          <div class="history-card">
+            <div class="history-head">
+              <div>
+                <p class="panel-kicker">Recent</p>
+                <h3>Saved payloads</h3>
+              </div>
+              <button id="clear-history" class="ghost-button small" type="button">Clear history</button>
+            </div>
+            <div id="history-list" class="history-list"></div>
+          </div>
+        </aside>
+
+        <section class="panel preview-panel">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Live preview</p>
+              <h2>See the code exactly as it will export</h2>
+            </div>
+            <button id="refresh-button" class="ghost-button" type="button">Refresh</button>
+          </div>
+
+          <div class="preview-frame">
+            <div class="preview-art"></div>
+            <canvas id="qr-canvas" width="512" height="512" aria-label="QR code preview"></canvas>
+          </div>
+
+          <div class="preview-meta">
+            <div class="meta-item">
+              <span>Mode</span>
+              <strong id="mode-label">Link</strong>
+            </div>
+            <div class="meta-item">
+              <span>Data size</span>
+              <strong id="size-label">0 bytes</strong>
+            </div>
+            <div class="meta-item">
+              <span>Capacity note</span>
+              <strong id="capacity-label">Waiting for input</strong>
+            </div>
+          </div>
+
+          <div class="note-card">
+            <p>
+              Tip: high error correction helps when you use a logo, but it also reduces payload capacity. For pictures, use a small image or a short data URL.
+            </p>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
