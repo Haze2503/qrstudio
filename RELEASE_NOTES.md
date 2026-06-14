@@ -1,6 +1,6 @@
-# Release 1.0.0
+# Release 1.0.1
 
-First release of Proper QR Studio.
+Packaged Windows release with a bundled executable.
 
 ## Included
 
@@ -10,3 +10,5 @@ First release of Proper QR Studio.
 - Recent payload history
 - Installable PWA support with offline caching
 - Responsive UI polish and app icon
+- Packaged Windows executable at `dist/ProperQRStudio.exe`
+

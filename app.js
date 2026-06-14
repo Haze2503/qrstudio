@@ -1,5 +1,3 @@
-import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
-
 const state = {
   mode: "link",
   logoDataUrl: "",
@@ -268,8 +266,9 @@ async function renderQr(saveToHistory = false) {
   }
 
   try {
-    const config = getConfig();
-    await QRCode.toCanvas(elements.qrCanvas, payload, config);
+    const qr = buildQrCode(payload);
+    const svg = buildColoredSvg(qr);
+    await drawSvgToCanvas(svg);
     await applyLogoOverlay();
     setStatus("Ready", `Generated ${formatMode(state.mode)} QR successfully.`);
     elements.capacityLabel.textContent = bytes > 1000 ? "Large payload" : "Within safe range";
@@ -284,6 +283,49 @@ async function renderQr(saveToHistory = false) {
     setStatus("Needs attention", message.includes("overflow") ? "Payload is too large for the selected settings." : "The QR could not be generated.");
     elements.capacityLabel.textContent = "Reduce size or shorten content";
   }
+}
+
+function buildQrCode(payload) {
+  const qr = qrcode(0, elements.errorCorrection.value);
+  qr.addData(payload, state.mode === "text" ? "Byte" : "Byte");
+  qr.make();
+  return qr;
+}
+
+function buildColoredSvg(qr) {
+  const size = Number(elements.sizeInput.value);
+  const cellSize = Math.max(4, Math.floor(size / (qr.getModuleCount() + 8)));
+  const margin = Number(elements.marginInput.value) * cellSize;
+  const svg = qr.createSvgTag({
+    cellSize,
+    margin,
+    scalable: true,
+    alt: "QR code preview",
+    title: "Proper QR Studio preview",
+  });
+
+  return svg
+    .replace('fill="white"', `fill="${elements.backgroundInput.value}"`)
+    .replace('fill="black"', `fill="${elements.foregroundInput.value}"`);
+}
+
+async function drawSvgToCanvas(svgText) {
+  const size = Number(elements.sizeInput.value);
+  const ctx = elements.qrCanvas.getContext("2d");
+  const image = await loadImage(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgText)}`);
+
+  elements.qrCanvas.width = size;
+  elements.qrCanvas.height = size;
+  ctx.clearRect(0, 0, size, size);
+  ctx.fillStyle = elements.backgroundInput.value;
+  ctx.fillRect(0, 0, size, size);
+
+  const scale = Math.min(size / image.width, size / image.height);
+  const drawWidth = Math.round(image.width * scale);
+  const drawHeight = Math.round(image.height * scale);
+  const x = Math.round((size - drawWidth) / 2);
+  const y = Math.round((size - drawHeight) / 2);
+  ctx.drawImage(image, x, y, drawWidth, drawHeight);
 }
 
 function setStatus(headline, detail) {
@@ -499,8 +541,8 @@ async function downloadSvg() {
     return;
   }
 
-  const config = getConfig();
-  const svg = await QRCode.toString(payload, { ...config, type: "svg" });
+  const qr = buildQrCode(payload);
+  const svg = buildColoredSvg(qr);
   const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
   triggerDownload(blob, `${buildFileName()}.svg`);
   setStatus("Saved", "SVG file downloaded.");

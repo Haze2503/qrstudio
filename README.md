@@ -22,6 +22,16 @@ python -m http.server 8000 -d "d:\Documents (D)\CODE PROJECTS\proper qr"
 
 Then open `http://127.0.0.1:8000/index.html`.
 
+## Windows build
+
+A packaged Windows executable is produced at `dist/ProperQRStudio.exe`.
+
+You can rebuild it with:
+
+```powershell
+powershell.exe -ExecutionPolicy Bypass -File "d:\Documents (D)\CODE PROJECTS\proper qr\build_exe.ps1"
+```
+
 ## Files
 
 - `index.html` - app shell and UI
